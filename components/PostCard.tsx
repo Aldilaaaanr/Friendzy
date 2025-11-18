@@ -37,17 +37,40 @@ export default function PostCard({
             <View className="absolute w-full h-full bg-black/50" />
 
             {/* Top Left: Category Chip */}
-            <View className="absolute top-6 left-6 overflow-hidden rounded-full">
-                <BlurView
-                    intensity={60}
-                    tint="light"
-                    className="px-4 py-2 flex-row items-center gap-2"
-                >
-                    <Text className="text-xl">🏝️</Text>
-                    <Text className="text-white font-semibold text-lg">
-                        {category}
-                    </Text>
-                </BlurView>
+            <View className="absolute top-6 left-6 overflow-hidden rounded-full bg-primary px-4 py-2 flex-row items-center gap-2">
+                {category === "Travel" && (
+                    <Ionicons name="airplane" size={16} color="#fff" />
+                )}
+                {category === "Food" && (
+                    <Ionicons name="restaurant" size={16} color="#fff" />
+                )}
+                {category === "Nature" && (
+                    <Ionicons name="leaf" size={16} color="#fff" />
+                )}
+                {category === "Technology" && (
+                    <Ionicons name="laptop" size={16} color="#fff" />
+                )}
+                {category === "Art" && (
+                    <Ionicons name="color-palette" size={16} color="#fff" />
+                )}
+                {category === "Sports" && (
+                    <Ionicons name="football" size={16} color="#fff" />
+                )}
+                {category === "Music" && (
+                    <Ionicons name="musical-notes" size={16} color="#fff" />
+                )}
+                {category === "Fashion" && (
+                    <Ionicons name="shirt" size={16} color="#fff" />
+                )}
+                {category === "Health" && (
+                    <Ionicons name="heart" size={16} color="#fff" />
+                )}
+                {category === "Education" && (
+                    <Ionicons name="school" size={16} color="#fff" />
+                )}
+                <Text className="text-white font-semibold text-lg">
+                    {category}
+                </Text>
             </View>
 
             {/* Right Side: Action Bar */}

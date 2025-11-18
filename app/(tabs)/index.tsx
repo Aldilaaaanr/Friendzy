@@ -1,8 +1,11 @@
 import Colors from "@/colors";
+import CustomTabs from "@/components/CustomTabs";
 import PostCard from "@/components/PostCard";
 import Stories from "@/components/Stories";
 import "@/global.css";
 import { Ionicons } from "@expo/vector-icons";
+import React, { useState } from "react";
+
 import {
     FlatList,
     ScrollView,
@@ -67,6 +70,7 @@ const posts = [
 
 export default function App() {
     const insets = useSafeAreaInsets();
+    const [activeTab, setActiveTab] = useState("Make Friends");
 
     return (
         <SafeAreaView
@@ -108,6 +112,13 @@ export default function App() {
                                 isMyStory={item.isMyStory}
                             />
                         )}
+                    />
+                </View>
+                <View className="mt-8 px-5">
+                    <CustomTabs
+                        tabs={["Make Friends", "Search Partners"]}
+                        activeTab={activeTab}
+                        onTabChange={setActiveTab}
                     />
                 </View>
 
