@@ -1,2 +1,3 @@
-import { Tabs, useRouter } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import BottomNavLayout from "@/components/BottomNav";
+
+export default BottomNavLayout;

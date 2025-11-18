@@ -56,8 +56,7 @@ export default function Button({
                         containerClass:
                             "rounded-full w-full flex-row items-center px-3 py-3",
                         containerStyle: { backgroundColor: customColor },
-                        textClass:
-                            "text-white font-semibold text-base flex-1 text-center",
+                        textClass: "text-white font-semibold text-lg",
                         iconBgClass: "bg-white rounded-full p-2",
                     };
                 case "secondary":
@@ -67,8 +66,7 @@ export default function Button({
                         containerStyle: {
                             backgroundColor: "rgba(221, 136, 207, 0.1)",
                         },
-                        textClass:
-                            "text-[#4B164C] font-semibold text-base flex-1 text-center",
+                        textClass: "text-[#4B164C] font-semibold text-lg",
                         iconBgClass: "bg-white rounded-full p-2",
                     };
                 case "base":
@@ -76,7 +74,7 @@ export default function Button({
                     return {
                         containerClass:
                             "rounded-full w-full flex-row items-center px-3 py-3 bg-gray-100",
-                        textClass: "font-semibold text-base flex-1 text-center",
+                        textClass: "font-semibold text-lg",
                         textStyle: { color: customColor },
                         iconBgClass: "bg-white rounded-full p-2",
                     };
@@ -89,8 +87,7 @@ export default function Button({
                 return {
                     containerClass:
                         "rounded-full w-full flex-row items-center px-3 py-3 bg-[#4B164C]",
-                    textClass:
-                        "text-white font-semibold text-base flex-1 text-center",
+                    textClass: "text-white font-semibold text-lg",
                     iconBgClass: "bg-white rounded-full p-2",
                 };
             case "secondary":
@@ -100,8 +97,7 @@ export default function Button({
                     containerStyle: {
                         backgroundColor: "rgba(221, 136, 207, 0.1)",
                     },
-                    textClass:
-                        "text-[#4B164C] font-semibold text-base flex-1 text-center",
+                    textClass: "text-[#4B164C] font-semibold text-lg",
                     iconBgClass: "bg-white rounded-full p-2",
                 };
             case "base":
@@ -109,8 +105,7 @@ export default function Button({
                 return {
                     containerClass:
                         "rounded-full w-full flex-row items-center px-3 py-3 bg-gray-100",
-                    textClass:
-                        "text-gray-800 font-semibold text-base flex-1 text-center",
+                    textClass: "text-gray-800 font-semibold text-lg",
                     iconBgClass: "bg-white rounded-full p-2",
                 };
         }
@@ -142,10 +137,13 @@ export default function Button({
                 </View>
             )}
             {title && (
-                <Text className={styles.textClass} style={styles.textStyle}>
-                    {title}
-                </Text>
+                <View className="flex-1 items-center justify-center ">
+                    <Text className={styles.textClass} style={styles.textStyle}>
+                        {title}
+                    </Text>
+                </View>
             )}
+            {icon && <View className="w-10" />}
         </TouchableOpacity>
     );
 }
