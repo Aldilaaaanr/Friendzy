@@ -12,12 +12,10 @@ import {
     ActivityIndicator,
 } from "react-native";
 import Colors from "@/colors";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, Octicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
-
-// --- DATA DUMMY ---
 
 const newUsers = [
     {
@@ -114,8 +112,6 @@ const nearbyUsers = [
         interests: ["Fashion", "Music"],
     },
 ];
-
-// --- KOMPONEN UTAMA ---
 
 export default function App() {
     // State
@@ -214,18 +210,18 @@ export default function App() {
                         </TouchableOpacity>
                     </View>
 
-                    <View className="flex-row space-x-4">
-                        <TouchableOpacity className="p-2 items-center justify-center">
+                    <View className="flex-row gap-3">
+                        <TouchableOpacity className="w-12 h-12 bg-white rounded-full items-center justify-center border border-gray-100">
                             <Ionicons
                                 name="search"
-                                size={32}
+                                size={24}
                                 color={Colors.secondary}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity className="p-2 items-center justify-center">
+                        <TouchableOpacity className="w-12 h-12 bg-white rounded-full items-center justify-center border border-gray-100">
                             <Ionicons
-                                name="filter"
-                                size={26}
+                                name="options-outline"
+                                size={22}
                                 color={Colors.secondary}
                             />
                         </TouchableOpacity>
