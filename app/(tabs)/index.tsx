@@ -1,5 +1,4 @@
 import Colors from "@/colors";
-import CustomTabs from "@/components/CustomTabs";
 import PostCard from "@/components/PostCard";
 import Stories from "@/components/Stories";
 import "@/global.css";
@@ -67,6 +66,42 @@ const posts = [
         },
     },
 ];
+
+interface CustomTabsProps {
+    tabs: string[];
+    activeTab: string;
+    onTabChange: (tab: string) => void;
+}
+
+const CustomTabs: React.FC<CustomTabsProps> = ({
+    tabs,
+    activeTab,
+    onTabChange,
+}) => {
+    return (
+        <View className="bg-[#F8E8F8] p-1.5 rounded-full flex-row h-[54px]">
+            {tabs.map((tab) => (
+                <TouchableOpacity
+                    key={tab}
+                    className={`flex-1 items-center justify-center rounded-full ${
+                        activeTab === tab ? "bg-white" : "bg-transparent"
+                    }`}
+                    onPress={() => onTabChange(tab)}
+                >
+                    <Text
+                        className={`text-base font-bold ${
+                            activeTab === tab
+                                ? "text-primary"
+                                : "text-secondary"
+                        }`}
+                    >
+                        {tab}
+                    </Text>
+                </TouchableOpacity>
+            ))}
+        </View>
+    );
+};
 
 export default function App() {
     const insets = useSafeAreaInsets();

@@ -52,7 +52,7 @@ export default function BottomNavLayout() {
                 }}
             />
             <Tabs.Screen
-                name="explore"
+                name="discover"
                 options={{
                     title: "",
                     tabBarIcon: ({ focused }) =>
