@@ -2,14 +2,20 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-// Tipe data untuk props
+// Tipe data untuk props Item
 interface InterestPillProps {
     category: string;
     isSelected: boolean;
     onPress: () => void;
 }
 
-// Helper untuk icon mapping
+// Tipe data untuk props Component Utama
+interface InterestSectionProps {
+    selectedInterests: string[];
+    onToggleInterest: (category: string) => void;
+}
+
+// Helper untuk icon mapping (SAMA SEPERTI SEBELUMNYA)
 const getIconName = (category: string): keyof typeof Ionicons.glyphMap => {
     switch (category) {
         case "Travel":
@@ -64,7 +70,10 @@ function InterestPill({ category, isSelected, onPress }: InterestPillProps) {
     );
 }
 
-export default function InterestSection() {
+export default function InterestSection({
+    selectedInterests,
+    onToggleInterest,
+}: InterestSectionProps) {
     const categories = [
         "Sports",
         "Nature",
@@ -78,19 +87,7 @@ export default function InterestSection() {
         "Education",
     ];
 
-    // State untuk menghandle multiple selection
-    const [selectedInterests, setSelectedInterests] = useState<string[]>([
-        "Music",
-    ]);
     const [isExpanded, setIsExpanded] = useState(false);
-
-    const toggleInterest = (category: string) => {
-        if (selectedInterests.includes(category)) {
-            setSelectedInterests((prev) => prev.filter((c) => c !== category));
-        } else {
-            setSelectedInterests((prev) => [...prev, category]);
-        }
-    };
 
     const toggleExpansion = () => {
         setIsExpanded(!isExpanded);
@@ -99,18 +96,13 @@ export default function InterestSection() {
     const sortedCategories = [...categories].sort((a, b) => {
         const aIsSelected = selectedInterests.includes(a);
         const bIsSelected = selectedInterests.includes(b);
-
-        if (aIsSelected && !bIsSelected) {
-            return -1;
-        }
-        if (!aIsSelected && bIsSelected) {
-            return 1;
-        }
+        if (aIsSelected && !bIsSelected) return -1;
+        if (!aIsSelected && bIsSelected) return 1;
         return 0;
     });
 
     return (
-        <View className="px-5 py-6 bg-background">
+        <View className="px-5 pt-6 bg-background">
             {/* Header */}
             <View className="flex-row justify-between items-end mb-4">
                 <Text className="text-2xl font-extrabold text-black">
@@ -131,7 +123,7 @@ export default function InterestSection() {
                             key={category}
                             category={category}
                             isSelected={selectedInterests.includes(category)}
-                            onPress={() => toggleInterest(category)}
+                            onPress={() => onToggleInterest(category)}
                         />
                     ))}
                 </View>
@@ -142,7 +134,7 @@ export default function InterestSection() {
                             key={category}
                             category={category}
                             isSelected={selectedInterests.includes(category)}
-                            onPress={() => toggleInterest(category)}
+                            onPress={() => onToggleInterest(category)}
                         />
                     ))}
                 </ScrollView>
