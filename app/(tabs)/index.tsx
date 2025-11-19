@@ -122,10 +122,10 @@ export default function App() {
                     <Text className="text-3xl font-extrabold text-primary">
                         Friendzy
                     </Text>
-                    <TouchableOpacity className="p-2 items-center justify-center">
+                    <TouchableOpacity className="w-12 h-12 bg-white rounded-full items-center justify-center border border-gray-100">
                         <Ionicons
                             name="notifications"
-                            size={32}
+                            size={24}
                             color={Colors.secondary}
                         />
                     </TouchableOpacity>

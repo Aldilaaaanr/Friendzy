@@ -12,7 +12,7 @@ import {
     ActivityIndicator,
 } from "react-native";
 import Colors from "@/colors";
-import { Ionicons, Octicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";

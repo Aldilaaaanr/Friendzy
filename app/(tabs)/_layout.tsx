@@ -80,7 +80,7 @@ export default function BottomNavLayout() {
                 }}
             />
             <Tabs.Screen
-                name="chats"
+                name="messages"
                 options={{
                     title: "",
                     tabBarIcon: ({ focused }) =>
