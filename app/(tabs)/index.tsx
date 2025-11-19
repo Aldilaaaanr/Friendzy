@@ -79,7 +79,7 @@ const CustomTabs: React.FC<CustomTabsProps> = ({
     onTabChange,
 }) => {
     return (
-        <View className="bg-[#F8E8F8] p-1.5 rounded-full flex-row h-[54px]">
+        <View className="bg-[#F8E8F8] p-1.5 rounded-3xl flex-row h-[54px]">
             {tabs.map((tab) => (
                 <TouchableOpacity
                     key={tab}
@@ -122,7 +122,7 @@ export default function App() {
                     <Text className="text-3xl font-extrabold text-primary">
                         Friendzy
                     </Text>
-                    <TouchableOpacity className="p-2">
+                    <TouchableOpacity className="p-2 items-center justify-center">
                         <Ionicons
                             name="notifications"
                             size={32}
