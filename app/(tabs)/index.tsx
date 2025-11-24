@@ -89,7 +89,7 @@ const CustomTabs: React.FC<CustomTabsProps> = ({
                     onPress={() => onTabChange(tab)}
                 >
                     <Text
-                        className={`text-base font-bold ${
+                        className={`text-base font-extrabold ${
                             activeTab === tab
                                 ? "text-primary"
                                 : "text-secondary"

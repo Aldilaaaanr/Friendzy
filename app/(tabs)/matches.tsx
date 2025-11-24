@@ -107,6 +107,23 @@ const MatchCard = ({ item }: { item: (typeof MATCHES_DATA)[0] }) => {
         <TouchableOpacity
             activeOpacity={0.8}
             className="flex-1 h-[280px] mb-4 rounded-[30px] overflow-hidden relative mx-2 bg-white shadow-sm border-[5px] border-secondary"
+            onPress={() => {
+                // Kirim data item sebagai params
+                router.push({
+                    pathname: "/(matches)/[id]",
+                    params: {
+                        id: item.id,
+                        name: item.name,
+                        age: item.age,
+                        location: item.location,
+                        distance: item.distance,
+                        matchPercentage: item.matchPercentage,
+                        image: item.image,
+                        about: "A good listener. I love having a good talk to know each other’s side 😍.",
+                        interests: "Nature,Travel,Writing,People",
+                    },
+                });
+            }}
         >
             {/* Background Image */}
             <Image
