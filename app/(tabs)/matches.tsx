@@ -2,73 +2,18 @@ import Colors from "@/colors";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
-import React from "react";
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+    FlatList,
+    Image,
+    Text,
+    TouchableOpacity,
+    View,
+    ActivityIndicator,
+    Alert,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-// --- DUMMY DATA ---
-const MATCHES_DATA = [
-    {
-        id: "1",
-        name: "James",
-        age: 20,
-        location: "HANOVER",
-        distance: "1.3 km away",
-        matchPercentage: 100,
-        isOnline: true,
-        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    },
-    {
-        id: "2",
-        name: "Eddie",
-        age: 23,
-        location: "DORTMUND",
-        distance: "2 km away",
-        matchPercentage: 94,
-        isOnline: true,
-        image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    },
-    {
-        id: "3",
-        name: "Brandon",
-        age: 20,
-        location: "BERLIN",
-        distance: "2.5 km away",
-        matchPercentage: 89,
-        isOnline: false,
-        image: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    },
-    {
-        id: "4",
-        name: "Alfredo",
-        age: 20,
-        location: "MUNICH",
-        distance: "2.5 km away",
-        matchPercentage: 80,
-        isOnline: true,
-        image: "https://images.unsplash.com/photo-1504257432389-52343af06ae3?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    },
-    {
-        id: "5",
-        name: "Carlos",
-        age: 22,
-        location: "FRANKFURT",
-        distance: "3 km away",
-        matchPercentage: 76,
-        isOnline: false,
-        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    },
-    {
-        id: "6",
-        name: "Miguel",
-        age: 21,
-        location: "HAMBURG",
-        distance: "3.5 km away",
-        matchPercentage: 70,
-        isOnline: true,
-        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
-    },
-];
+import { api, Match, MatchStats } from "@/services/api";
 
 // --- SUB COMPONENTS ---
 
@@ -102,25 +47,17 @@ const ActionCircle = ({
 );
 
 // Komponen Kartu Match
-const MatchCard = ({ item }: { item: (typeof MATCHES_DATA)[0] }) => {
+const MatchCard = ({ item }: { item: Match }) => {
     return (
         <TouchableOpacity
             activeOpacity={0.8}
             className="flex-1 h-[280px] mb-4 rounded-[30px] overflow-hidden relative mx-2 bg-white shadow-sm border-[5px] border-secondary"
             onPress={() => {
-                // Kirim data item sebagai params
+                // Navigate ke detail, data akan di-fetch di detail screen
                 router.push({
                     pathname: "/(matches)/[id]",
                     params: {
                         id: item.id,
-                        name: item.name,
-                        age: item.age,
-                        location: item.location,
-                        distance: item.distance,
-                        matchPercentage: item.matchPercentage,
-                        image: item.image,
-                        about: "A good listener. I love having a good talk to know each other’s side 😍.",
-                        interests: "Nature,Travel,Writing,People",
                     },
                 });
             }}
@@ -179,6 +116,75 @@ const MatchCard = ({ item }: { item: (typeof MATCHES_DATA)[0] }) => {
 // --- MAIN COMPONENT ---
 
 export default function MatchesScreen() {
+    const [matches, setMatches] = useState<Match[]>([]);
+    const [stats, setStats] = useState<MatchStats>({ likes: 0, connects: 0 });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchMatches = async () => {
+            try {
+                const response = await api.getMatches();
+                console.log("Matches Response:", response);
+                console.log("Matches Response.data:", response?.data);
+                console.log("Matches Response.stats:", response?.stats);
+
+                // Handle different response structures
+                let matchesData: Match[] = [];
+                let statsData: MatchStats = { likes: 0, connects: 0 };
+
+                if (response) {
+                    // Jika response punya data dan stats
+                    if (response.data && Array.isArray(response.data)) {
+                        matchesData = response.data;
+                    }
+                    // Jika response langsung adalah array
+                    else if (Array.isArray(response)) {
+                        matchesData = response;
+                    }
+
+                    // Handle stats
+                    if (response.stats) {
+                        statsData = {
+                            likes: response.stats.likes || 0,
+                            connects: response.stats.connects || 0,
+                        };
+                    }
+                }
+
+                console.log("Final Matches Data:", matchesData);
+                console.log("Final Stats Data:", statsData);
+
+                setMatches(matchesData);
+                setStats(statsData);
+            } catch (error) {
+                console.error("Error fetching matches:", error);
+                setMatches([]);
+                setStats({ likes: 0, connects: 0 });
+                Alert.alert("Error", "Gagal memuat matches");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchMatches();
+    }, []);
+
+    if (loading) {
+        return (
+            <SafeAreaView
+                style={{ flex: 1, backgroundColor: Colors.background }}
+                edges={["top"]}
+            >
+                <View className="flex-1 items-center justify-center">
+                    <ActivityIndicator size="large" color={Colors.primary} />
+                    <Text className="mt-4 text-gray-500">
+                        Memuat matches...
+                    </Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
     return (
         <SafeAreaView
             style={{ flex: 1, backgroundColor: Colors.background }}
@@ -212,58 +218,69 @@ export default function MatchesScreen() {
                 </View>
 
                 <FlatList
-                    data={MATCHES_DATA}
+                    data={matches}
                     keyExtractor={(item) => item.id}
                     numColumns={2}
                     showsVerticalScrollIndicator={false}
                     columnWrapperStyle={{ justifyContent: "space-between" }}
                     contentContainerStyle={{ paddingBottom: 100 }}
-                    ListHeaderComponent={() => (
-                        <View className="px-2">
-                            {/* Top Action Circles */}
-                            <View className="flex-row mt-4 mb-8">
-                                <ActionCircle
-                                    icon={
-                                        <Ionicons
-                                            name="heart"
-                                            size={32}
-                                            color="white"
-                                        />
-                                    }
-                                    label="Likes"
-                                    count={32}
-                                    color1="#9C7999"
-                                    color2="#6B4569"
-                                />
-                                <ActionCircle
-                                    icon={
-                                        <MaterialCommunityIcons
-                                            name="chat"
-                                            size={32}
-                                            color="white"
-                                        />
-                                    }
-                                    label="Connect"
-                                    count={15}
-                                    color1="#E5989B"
-                                    color2="#D6686C"
-                                />
-                            </View>
-
-                            {/* Section Title */}
-                            <View className="flex-row items-center gap-2 mb-4">
-                                <Text className="text-[22px] font-extrabold text-primary">
-                                    Your Matches
-                                </Text>
-                                <Text
-                                    style={{ color: Colors.secondary }}
-                                    className="text-[22px] font-extrabold"
-                                >
-                                    {MATCHES_DATA.length}
-                                </Text>
-                            </View>
+                    ListEmptyComponent={
+                        <View className="items-center justify-center py-20 px-5">
+                            <Text className="text-gray-500 text-center">
+                                Tidak ada matches tersedia
+                            </Text>
                         </View>
-                    )}
+                    }
+                    ListHeaderComponent={() => {
+                        // Ensure stats is always defined
+                        const safeStats = stats || { likes: 0, connects: 0 };
+                        return (
+                            <View className="px-2">
+                                {/* Top Action Circles */}
+                                <View className="flex-row mt-4 mb-8">
+                                    <ActionCircle
+                                        icon={
+                                            <Ionicons
+                                                name="heart"
+                                                size={32}
+                                                color="white"
+                                            />
+                                        }
+                                        label="Likes"
+                                        count={safeStats.likes || 0}
+                                        color1="#9C7999"
+                                        color2="#6B4569"
+                                    />
+                                    <ActionCircle
+                                        icon={
+                                            <MaterialCommunityIcons
+                                                name="chat"
+                                                size={32}
+                                                color="white"
+                                            />
+                                        }
+                                        label="Connect"
+                                        count={safeStats.connects || 0}
+                                        color1="#E5989B"
+                                        color2="#D6686C"
+                                    />
+                                </View>
+
+                                {/* Section Title */}
+                                <View className="flex-row items-center gap-2 mb-4">
+                                    <Text className="text-[22px] font-extrabold text-primary">
+                                        Your Matches
+                                    </Text>
+                                    <Text
+                                        style={{ color: Colors.secondary }}
+                                        className="text-[22px] font-extrabold"
+                                    >
+                                        {matches.length}
+                                    </Text>
+                                </View>
+                            </View>
+                        );
+                    }}
                     renderItem={({ item }) => <MatchCard item={item} />}
                 />
             </View>

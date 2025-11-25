@@ -3,7 +3,7 @@ import PostCard from "@/components/PostCard";
 import Stories from "@/components/Stories";
 import "@/global.css";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import {
     FlatList,
@@ -11,61 +11,14 @@ import {
     Text,
     TouchableOpacity,
     View,
+    ActivityIndicator,
+    Alert,
 } from "react-native";
 import {
     SafeAreaView,
     useSafeAreaInsets,
 } from "react-native-safe-area-context";
-
-const stories = [
-    { id: 1, name: "Story 1", profileImage: "", isMyStory: true },
-    {
-        id: 2,
-        name: "Story 2",
-        profileImage:
-            "https://i.pinimg.com/736x/7e/2a/2d/7e2a2d2852d1f7d5fd4d5cd169e18eec.jpg",
-    },
-    { id: 3, name: "Story 3", profileImage: "" },
-    { id: 4, name: "Story 4", profileImage: "" },
-    { id: 5, name: "Story 5", profileImage: "" },
-    { id: 6, name: "Story 6", profileImage: "" },
-];
-
-const posts = [
-    {
-        id: 1,
-        image: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        category: "Travel",
-        title: "If you could live anywhere in the world, where would you pick?",
-        user: {
-            name: "Miranda Kehlani",
-            location: "Stuttgart",
-            avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-        },
-    },
-    {
-        id: 2,
-        image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        category: "Food",
-        title: "What is your favorite dish to cook at home?",
-        user: {
-            name: "John Doe",
-            location: "New York",
-            avatar: "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-        },
-    },
-    {
-        id: 3,
-        image: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
-        category: "Nature",
-        title: "What is your favorite outdoor activity?",
-        user: {
-            name: "Jane Smith",
-            location: "San Francisco",
-            avatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80",
-        },
-    },
-];
+import { api, Story, Post } from "@/services/api";
 
 interface CustomTabsProps {
     tabs: string[];
@@ -106,6 +59,92 @@ const CustomTabs: React.FC<CustomTabsProps> = ({
 export default function App() {
     const insets = useSafeAreaInsets();
     const [activeTab, setActiveTab] = useState("Make Friends");
+    const [stories, setStories] = useState<Story[]>([]);
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [loadingPosts, setLoadingPosts] = useState(false);
+
+    // Debug: Monitor posts state changes
+    useEffect(() => {
+        console.log("Posts state changed:", posts);
+        console.log("Posts length:", posts.length);
+    }, [posts]);
+
+    // Fetch Stories
+    useEffect(() => {
+        const fetchStories = async () => {
+            try {
+                const data = await api.getStories();
+                setStories(Array.isArray(data) ? data : []);
+            } catch (error) {
+                console.error("Error fetching stories:", error);
+                setStories([]); // Set empty array on error
+                Alert.alert("Error", "Gagal memuat stories");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStories();
+    }, []);
+
+    // Fetch Posts
+    useEffect(() => {
+        const fetchPosts = async () => {
+            setLoadingPosts(true);
+            try {
+                const response = await api.getPosts(1, 10);
+                console.log("Posts Response:", response);
+                console.log("Posts Response Type:", typeof response);
+                console.log("Posts Response.data:", response?.data);
+                console.log("Is Array:", Array.isArray(response?.data));
+                
+                // Handle different response structures
+                let postsData: Post[] = [];
+                
+                if (response) {
+                    // Jika response adalah PostsResponse (punya data dan pagination)
+                    if (response.data && Array.isArray(response.data)) {
+                        postsData = response.data;
+                    }
+                    // Jika response langsung adalah array
+                    else if (Array.isArray(response)) {
+                        postsData = response;
+                    }
+                    // Jika response punya property 'posts'
+                    else if (response.posts && Array.isArray(response.posts)) {
+                        postsData = response.posts;
+                    }
+                }
+                
+                console.log("Final Posts Data:", postsData);
+                console.log("Final Posts Data Length:", postsData.length);
+                setPosts(postsData);
+            } catch (error) {
+                console.error("Error fetching posts:", error);
+                setPosts([]); // Set empty array on error
+                Alert.alert("Error", "Gagal memuat posts");
+            } finally {
+                setLoadingPosts(false);
+            }
+        };
+
+        fetchPosts();
+    }, []);
+
+    if (loading) {
+        return (
+            <SafeAreaView
+                style={{ flex: 1, backgroundColor: Colors.background }}
+                edges={["top"]}
+            >
+                <View className="flex-1 items-center justify-center">
+                    <ActivityIndicator size="large" color={Colors.primary} />
+                    <Text className="mt-4 text-gray-500">Memuat data...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView
@@ -133,21 +172,29 @@ export default function App() {
 
                 {/* stories */}
                 <View>
-                    <FlatList
-                        data={stories}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{ paddingHorizontal: 15 }}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={({ item }) => (
-                            <Stories
-                                id={item.id}
-                                name={item.name}
-                                profileImage={item.profileImage}
-                                isMyStory={item.isMyStory}
-                            />
-                        )}
-                    />
+                    {Array.isArray(stories) && stories.length > 0 ? (
+                        <FlatList
+                            data={stories}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={{ paddingHorizontal: 15 }}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={({ item }) => (
+                                <Stories
+                                    id={item.id}
+                                    name={item.name}
+                                    profileImage={item.profileImage}
+                                    isMyStory={item.isMyStory}
+                                />
+                            )}
+                        />
+                    ) : (
+                        <View className="px-5 py-4">
+                            <Text className="text-gray-400 text-sm">
+                                Tidak ada stories tersedia
+                            </Text>
+                        </View>
+                    )}
                 </View>
                 <View className="mt-8 px-5">
                     <CustomTabs
@@ -161,15 +208,36 @@ export default function App() {
                     className="px-5 mt-6"
                     style={{ marginBottom: insets.bottom + 100 }}
                 >
-                    {posts.map((post) => (
-                        <PostCard
-                            key={post.id}
-                            image={post.image}
-                            category={post.category}
-                            title={post.title}
-                            user={post.user}
-                        />
-                    ))}
+                    {loadingPosts ? (
+                        <View className="items-center justify-center py-10">
+                            <ActivityIndicator
+                                size="large"
+                                color={Colors.primary}
+                            />
+                            <Text className="mt-4 text-gray-500">
+                                Memuat posts...
+                            </Text>
+                        </View>
+                    ) : Array.isArray(posts) && posts.length > 0 ? (
+                        posts.map((post) => {
+                            console.log("Rendering post:", post.id, post.title);
+                            return (
+                                <PostCard
+                                    key={post.id}
+                                    image={post.image}
+                                    category={post.category}
+                                    title={post.title}
+                                    user={post.user}
+                                />
+                            );
+                        })
+                    ) : (
+                        <View className="items-center justify-center py-10">
+                            <Text className="text-gray-500">
+                                Tidak ada posts tersedia
+                            </Text>
+                        </View>
+                    )}
                 </View>
             </ScrollView>
         </SafeAreaView>

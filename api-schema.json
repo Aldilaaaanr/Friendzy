@@ -1,0 +1,825 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Friendzy API",
+        "description": "API Mock untuk aplikasi Friendzy - Social Networking App",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "https://mock.apidog.com/m1/your-project-id",
+            "description": "Mock Server Apidog"
+        }
+    ],
+    "paths": {
+        "/api/stories": {
+            "get": {
+                "summary": "Get Stories",
+                "description": "Mendapatkan daftar stories untuk ditampilkan di home feed",
+                "tags": ["Stories"],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Story"
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "success": true,
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "name": "My Story",
+                                            "profileImage": "https://i.pinimg.com/736x/7e/2a/2d/7e2a2d2852d1f7d5fd4d5cd169e18eec.jpg",
+                                            "isMyStory": true
+                                        },
+                                        {
+                                            "id": 2,
+                                            "name": "Story 2",
+                                            "profileImage": "https://i.pinimg.com/736x/7e/2a/2d/7e2a2d2852d1f7d5fd4d5cd169e18eec.jpg",
+                                            "isMyStory": false
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/posts": {
+            "get": {
+                "summary": "Get Posts",
+                "description": "Mendapatkan daftar posts untuk ditampilkan di home feed",
+                "tags": ["Posts"],
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Page number",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Post"
+                                            }
+                                        },
+                                        "pagination": {
+                                            "$ref": "#/components/schemas/Pagination"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "success": true,
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "image": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80",
+                                            "category": "Travel",
+                                            "title": "If you could live anywhere in the world, where would you pick?",
+                                            "user": {
+                                                "name": "Miranda Kehlani",
+                                                "location": "Stuttgart",
+                                                "avatar": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=200&q=80"
+                                            }
+                                        }
+                                    ],
+                                    "pagination": {
+                                        "page": 1,
+                                        "limit": 10,
+                                        "total": 50,
+                                        "totalPages": 5
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/new": {
+            "get": {
+                "summary": "Get New Users",
+                "description": "Mendapatkan daftar user baru untuk ditampilkan di discover page",
+                "tags": ["Users"],
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Number of users to return",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/NewUser"
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "success": true,
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "name": "Alice",
+                                            "age": 24,
+                                            "location": "New York",
+                                            "distance": 2,
+                                            "image": "https://randomuser.me/api/portraits/women/68.jpg",
+                                            "isNew": true,
+                                            "isOnline": true
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/users/nearby": {
+            "get": {
+                "summary": "Get Nearby Users",
+                "description": "Mendapatkan daftar user di sekitar lokasi untuk ditampilkan di map",
+                "tags": ["Users"],
+                "parameters": [
+                    {
+                        "name": "lat",
+                        "in": "query",
+                        "description": "Latitude",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "lng",
+                        "in": "query",
+                        "description": "Longitude",
+                        "required": true,
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "Radius in kilometers",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "default": 5
+                        }
+                    },
+                    {
+                        "name": "interests",
+                        "in": "query",
+                        "description": "Filter by interests (comma separated)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Music,Travel"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/NearbyUser"
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "success": true,
+                                    "data": [
+                                        {
+                                            "id": 101,
+                                            "name": "Clara",
+                                            "lat": 51.505,
+                                            "lng": -0.09,
+                                            "avatar": "https://randomuser.me/api/portraits/women/44.jpg",
+                                            "interests": ["Music", "Travel"]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/matches": {
+            "get": {
+                "summary": "Get Matches",
+                "description": "Mendapatkan daftar matches untuk ditampilkan di matches page",
+                "tags": ["Matches"],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Match"
+                                            }
+                                        },
+                                        "stats": {
+                                            "$ref": "#/components/schemas/MatchStats"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "success": true,
+                                    "data": [
+                                        {
+                                            "id": "1",
+                                            "name": "James",
+                                            "age": 20,
+                                            "location": "HANOVER",
+                                            "distance": "1.3 km away",
+                                            "matchPercentage": 100,
+                                            "isOnline": true,
+                                            "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                                        }
+                                    ],
+                                    "stats": {
+                                        "likes": 32,
+                                        "connects": 15
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/matches/{id}": {
+            "get": {
+                "summary": "Get Match Detail",
+                "description": "Mendapatkan detail lengkap dari sebuah match",
+                "tags": ["Matches"],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Match ID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/MatchDetail"
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "success": true,
+                                    "data": {
+                                        "id": "1",
+                                        "name": "James",
+                                        "age": 20,
+                                        "location": "HANOVER",
+                                        "distance": "1.3 km away",
+                                        "matchPercentage": 100,
+                                        "isOnline": true,
+                                        "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80",
+                                        "about": "A good listener. I love having a good talk to know each other's side 😍.",
+                                        "interests": [
+                                            "Nature",
+                                            "Travel",
+                                            "Writing",
+                                            "People"
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Match not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Error"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/messages": {
+            "get": {
+                "summary": "Get Messages",
+                "description": "Mendapatkan daftar messages untuk ditampilkan di messages page",
+                "tags": ["Messages"],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "recentMatches": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/RecentMatch"
+                                                    }
+                                                },
+                                                "messages": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "$ref": "#/components/schemas/Message"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "success": true,
+                                    "data": {
+                                        "recentMatches": [
+                                            {
+                                                "id": "likes",
+                                                "type": "likes",
+                                                "count": 32,
+                                                "image": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=500&auto=format&fit=crop&q=60"
+                                            },
+                                            {
+                                                "id": "1",
+                                                "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop&q=60"
+                                            }
+                                        ],
+                                        "messages": [
+                                            {
+                                                "id": "1",
+                                                "name": "Alfredo Calzoni",
+                                                "message": "What about that new jacket if I ...",
+                                                "time": "09:18",
+                                                "avatar": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&auto=format&fit=crop&q=60",
+                                                "unread": true
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/interests": {
+            "get": {
+                "summary": "Get Interests",
+                "description": "Mendapatkan daftar semua interests yang tersedia",
+                "tags": ["Interests"],
+                "responses": {
+                    "200": {
+                        "description": "Success",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "example": {
+                                    "success": true,
+                                    "data": [
+                                        "Sports",
+                                        "Nature",
+                                        "Music",
+                                        "Fashion",
+                                        "Travel",
+                                        "Food",
+                                        "Technology",
+                                        "Art",
+                                        "Health",
+                                        "Education"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Story": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "profileImage": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "isMyStory": {
+                        "type": "boolean"
+                    }
+                },
+                "required": ["id", "name", "isMyStory"]
+            },
+            "Post": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "image": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "category": {
+                        "type": "string",
+                        "enum": [
+                            "Travel",
+                            "Food",
+                            "Nature",
+                            "Technology",
+                            "Art",
+                            "Sports",
+                            "Music",
+                            "Fashion",
+                            "Health",
+                            "Education"
+                        ]
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    }
+                },
+                "required": ["id", "image", "category", "title", "user"]
+            },
+            "User": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "location": {
+                        "type": "string"
+                    },
+                    "avatar": {
+                        "type": "string",
+                        "format": "uri"
+                    }
+                },
+                "required": ["name", "location", "avatar"]
+            },
+            "NewUser": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "age": {
+                        "type": "integer"
+                    },
+                    "location": {
+                        "type": "string"
+                    },
+                    "distance": {
+                        "type": "number",
+                        "description": "Distance in kilometers"
+                    },
+                    "image": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "isNew": {
+                        "type": "boolean"
+                    },
+                    "isOnline": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "age",
+                    "location",
+                    "distance",
+                    "image",
+                    "isNew",
+                    "isOnline"
+                ]
+            },
+            "NearbyUser": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "lat": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "lng": {
+                        "type": "number",
+                        "format": "float"
+                    },
+                    "avatar": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "interests": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "required": ["id", "name", "lat", "lng", "avatar", "interests"]
+            },
+            "Match": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "age": {
+                        "type": "integer"
+                    },
+                    "location": {
+                        "type": "string"
+                    },
+                    "distance": {
+                        "type": "string"
+                    },
+                    "matchPercentage": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 100
+                    },
+                    "isOnline": {
+                        "type": "boolean"
+                    },
+                    "image": {
+                        "type": "string",
+                        "format": "uri"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "age",
+                    "location",
+                    "distance",
+                    "matchPercentage",
+                    "isOnline",
+                    "image"
+                ]
+            },
+            "MatchDetail": {
+                "allOf": [
+                    {
+                        "$ref": "#/components/schemas/Match"
+                    },
+                    {
+                        "type": "object",
+                        "properties": {
+                            "about": {
+                                "type": "string"
+                            },
+                            "interests": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "required": ["about", "interests"]
+                    }
+                ]
+            },
+            "MatchStats": {
+                "type": "object",
+                "properties": {
+                    "likes": {
+                        "type": "integer"
+                    },
+                    "connects": {
+                        "type": "integer"
+                    }
+                },
+                "required": ["likes", "connects"]
+            },
+            "RecentMatch": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string",
+                        "enum": ["likes", "user"],
+                        "description": "Type: 'likes' for likes card, 'user' for regular user"
+                    },
+                    "count": {
+                        "type": "integer",
+                        "description": "Only present when type is 'likes'"
+                    },
+                    "image": {
+                        "type": "string",
+                        "format": "uri"
+                    }
+                },
+                "required": ["id", "type", "image"]
+            },
+            "Message": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "time": {
+                        "type": "string",
+                        "pattern": "^([0-1][0-9]|2[0-3]):[0-5][0-9]$"
+                    },
+                    "avatar": {
+                        "type": "string",
+                        "format": "uri"
+                    },
+                    "unread": {
+                        "type": "boolean"
+                    }
+                },
+                "required": [
+                    "id",
+                    "name",
+                    "message",
+                    "time",
+                    "avatar",
+                    "unread"
+                ]
+            },
+            "Pagination": {
+                "type": "object",
+                "properties": {
+                    "page": {
+                        "type": "integer"
+                    },
+                    "limit": {
+                        "type": "integer"
+                    },
+                    "total": {
+                        "type": "integer"
+                    },
+                    "totalPages": {
+                        "type": "integer"
+                    }
+                },
+                "required": ["page", "limit", "total", "totalPages"]
+            },
+            "Error": {
+                "type": "object",
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "error": {
+                        "type": "string"
+                    }
+                },
+                "required": ["success", "message"]
+            }
+        }
+    }
+}

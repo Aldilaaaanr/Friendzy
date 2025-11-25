@@ -3,7 +3,7 @@ import { Ionicons, FontAwesome } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router, useLocalSearchParams } from "expo-router";
 import CircularProgress from "@/components/CircularProgress";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     Dimensions,
     Image,
@@ -11,33 +11,65 @@ import {
     Text,
     TouchableOpacity,
     View,
+    ActivityIndicator,
+    Alert,
 } from "react-native";
 import {
     SafeAreaView,
     useSafeAreaInsets,
 } from "react-native-safe-area-context";
+import { api, MatchDetail } from "@/services/api";
 
 const { height } = Dimensions.get("window");
 
 export default function MatchDetailScreen() {
     const insets = useSafeAreaInsets();
     const params = useLocalSearchParams();
+    const [user, setUser] = useState<MatchDetail | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const user = {
-        id: params.id,
-        name: params.name,
-        age: params.age,
-        location: params.location,
-        distance: params.distance,
-        image: params.image as string,
-        match: params.matchPercentage as unknown as number,
-        about: params.about || "No description available.", // Fallback jika kosong
-        // Split string kembali menjadi array
-        interests:
-            typeof params.interests === "string"
-                ? params.interests.split(",")
-                : ["General"],
-    };
+    useEffect(() => {
+        const fetchMatchDetail = async () => {
+            if (!params.id) {
+                Alert.alert("Error", "ID tidak valid");
+                router.back();
+                return;
+            }
+
+            try {
+                const data = await api.getMatchDetail(params.id as string);
+                setUser(data);
+            } catch (error) {
+                console.error("Error fetching match detail:", error);
+                Alert.alert("Error", "Gagal memuat detail match", [
+                    {
+                        text: "OK",
+                        onPress: () => router.back(),
+                    },
+                ]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchMatchDetail();
+    }, [params.id]);
+
+    if (loading || !user) {
+        return (
+            <SafeAreaView
+                style={{ flex: 1, backgroundColor: Colors.background }}
+                edges={["top"]}
+            >
+                <View className="flex-1 items-center justify-center">
+                    <ActivityIndicator size="large" color={Colors.primary} />
+                    <Text className="mt-4 text-gray-500">
+                        Memuat detail match...
+                    </Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView
@@ -75,9 +107,9 @@ export default function MatchDetailScreen() {
 
                     <View className="flex-row items-center bg-white/20 backdrop-blur-md px-4 py-2 rounded-full border border-white/30">
                         <Ionicons name="navigate" size={16} color="white" />
-                        <Text className="text-white font-bold ml-2">
-                            {user.distance}
-                        </Text>
+                    <Text className="text-white font-bold ml-2">
+                        {user.distance || "Unknown"}
+                    </Text>
                     </View>
                 </View>
 
@@ -93,13 +125,13 @@ export default function MatchDetailScreen() {
                     {/* Match Badge */}
                     <View className="flex-row items-center bg-[#4A144B]/80 border border-[#DD88CF] px-2 py-2 rounded-full backdrop-blur-sm">
                         <View className="mr-3">
-                            <CircularProgress
-                                percentage={user.match}
-                                size={45}
-                                strokeWidth={4}
-                                color="#DD88CF"
-                                trackColor="rgba(255,255,255,0.2)"
-                            />
+                        <CircularProgress
+                            percentage={user.matchPercentage}
+                            size={45}
+                            strokeWidth={4}
+                            color="#DD88CF"
+                            trackColor="rgba(255,255,255,0.2)"
+                        />
                         </View>
 
                         <Text className="text-white text-2xl font-bold mr-2">
@@ -120,7 +152,7 @@ export default function MatchDetailScreen() {
                 <View className="px-6">
                     <Text className="text-gray-400 text-lg mb-2">About</Text>
                     <Text className="text-gray-800 text-base leading-6 font-medium mb-6">
-                        {user.about}
+                        {user.about || "No description available."}
                     </Text>
 
                     <Text className="text-gray-400 text-lg mb-4">Interest</Text>

@@ -120,7 +120,7 @@ export default function AroundMeMap({ users, userLocation }: AroundMeMapProps) {
         <div id="map"></div>
         <script>
             // Inisialisasi Peta
-            var map = L.map('map', { zoomControl: false }).setView([51.505, -0.09], 13);
+            var map = L.map('map', { zoomControl: false }).setView([-6.904, 107.468], 7);
             
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                 attribution: '&copy; OpenStreetMap contributors'

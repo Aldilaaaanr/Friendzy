@@ -13,105 +13,10 @@ import {
 } from "react-native";
 import Colors from "@/colors";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as Location from "expo-location";
-
-const newUsers = [
-    {
-        id: 1,
-        name: "Alice",
-        age: 24,
-        location: "New York",
-        distance: 2,
-        image: "https://randomuser.me/api/portraits/women/68.jpg",
-        isNew: true,
-        isOnline: true,
-    },
-    {
-        id: 2,
-        name: "Bob",
-        age: 27,
-        location: "Los Angeles",
-        distance: 5,
-        image: "https://randomuser.me/api/portraits/men/45.jpg",
-        isNew: true,
-        isOnline: false,
-    },
-    {
-        id: 3,
-        name: "Catherine",
-        age: 22,
-        location: "Chicago",
-        distance: 3,
-        image: "https://randomuser.me/api/portraits/women/12.jpg",
-        isNew: false,
-        isOnline: true,
-    },
-    {
-        id: 4,
-        name: "David",
-        age: 30,
-        location: "Miami",
-        distance: 8,
-        image: "https://randomuser.me/api/portraits/men/22.jpg",
-        isNew: true,
-        isOnline: true,
-    },
-    {
-        id: 5,
-        name: "Eva",
-        age: 26,
-        location: "Seattle",
-        distance: 4,
-        image: "https://randomuser.me/api/portraits/women/34.jpg",
-        isNew: false,
-        isOnline: false,
-    },
-];
-
-const nearbyUsers = [
-    {
-        id: 101,
-        name: "Clara",
-        lat: 51.505,
-        lng: -0.09,
-        avatar: "https://randomuser.me/api/portraits/women/44.jpg",
-        interests: ["Music", "Travel"],
-    },
-    {
-        id: 102,
-        name: "John",
-        lat: 51.51,
-        lng: -0.1,
-        avatar: "https://randomuser.me/api/portraits/men/32.jpg",
-        interests: ["Sports", "Technology"],
-    },
-    {
-        id: 103,
-        name: "Sarah",
-        lat: 51.51,
-        lng: -0.08,
-        avatar: "https://randomuser.me/api/portraits/women/65.jpg",
-        interests: ["Music", "Art"],
-    },
-    {
-        id: 104,
-        name: "Mike",
-        lat: 51.5,
-        lng: -0.085,
-        avatar: "https://randomuser.me/api/portraits/men/11.jpg",
-        interests: ["Food", "Travel"],
-    },
-    {
-        id: 105,
-        name: "Emily",
-        lat: 51.49,
-        lng: -0.1,
-        avatar: "https://randomuser.me/api/portraits/women/22.jpg",
-        interests: ["Fashion", "Music"],
-    },
-];
+import { api, NewUser, NearbyUser } from "@/services/api";
 
 export default function App() {
     // State
@@ -123,21 +28,32 @@ export default function App() {
         longitude: number;
     } | null>(null);
     const [loadingLocation, setLoadingLocation] = useState(false);
+    const [newUsers, setNewUsers] = useState<NewUser[]>([]);
+    const [nearbyUsers, setNearbyUsers] = useState<NearbyUser[]>([]);
+    const [loadingNewUsers, setLoadingNewUsers] = useState(true);
+    const [loadingNearbyUsers, setLoadingNearbyUsers] = useState(false);
 
-    // Handler: Toggle Interest
-    const toggleInterest = (category: string) => {
-        if (selectedInterests.includes(category)) {
-            setSelectedInterests((prev) => prev.filter((c) => c !== category));
-        } else {
-            setSelectedInterests((prev) => [...prev, category]);
-        }
-    };
+    // Fetch New Users
+    useEffect(() => {
+        const fetchNewUsers = async () => {
+            try {
+                const data = await api.getNewUsers(10);
+                setNewUsers(data);
+            } catch (error) {
+                console.error("Error fetching new users:", error);
+                Alert.alert("Error", "Gagal memuat user baru");
+            } finally {
+                setLoadingNewUsers(false);
+            }
+        };
+
+        fetchNewUsers();
+    }, []);
 
     // Handler: Get Location (Native)
     const handleLocateMe = async () => {
         setLoadingLocation(true);
         try {
-            // 1. Minta Izin
             let { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== "granted") {
                 Alert.alert(
@@ -148,12 +64,10 @@ export default function App() {
                 return;
             }
 
-            // 2. Ambil Lokasi
             let location = await Location.getCurrentPositionAsync({
-                accuracy: Location.Accuracy.Balanced, // Balanced cukup untuk peta umum & lebih cepat
+                accuracy: Location.Accuracy.Balanced,
             });
 
-            // 3. Simpan ke State (akan mentrigger update di Map Component)
             setUserLocation({
                 latitude: location.coords.latitude,
                 longitude: location.coords.longitude,
@@ -169,7 +83,46 @@ export default function App() {
         }
     };
 
-    // Filter Users based on Interests
+    // Auto Locate on Mount (Added)
+    useEffect(() => {
+        handleLocateMe();
+    }, []);
+
+    // Fetch Nearby Users when location or interests change
+    useEffect(() => {
+        if (userLocation) {
+            const fetchNearbyUsers = async () => {
+                setLoadingNearbyUsers(true);
+                try {
+                    const data = await api.getNearbyUsers(
+                        userLocation.latitude,
+                        userLocation.longitude,
+                        5,
+                        selectedInterests.length > 0
+                            ? selectedInterests
+                            : undefined
+                    );
+                    setNearbyUsers(data);
+                } catch (error) {
+                    console.error("Error fetching nearby users:", error);
+                } finally {
+                    setLoadingNearbyUsers(false);
+                }
+            };
+
+            fetchNearbyUsers();
+        }
+    }, [userLocation, selectedInterests]);
+
+    // Handler: Toggle Interest
+    const toggleInterest = (category: string) => {
+        if (selectedInterests.includes(category)) {
+            setSelectedInterests((prev) => prev.filter((c) => c !== category));
+        } else {
+            setSelectedInterests((prev) => [...prev, category]);
+        }
+    };
+
     const filteredMapUsers = nearbyUsers.filter((user) =>
         user.interests.some((interest) => selectedInterests.includes(interest))
     );
@@ -230,24 +183,43 @@ export default function App() {
 
                 {/* New User Section */}
                 <View className="mt-2">
-                    <FlatList
-                        data={newUsers}
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{ paddingHorizontal: 15 }}
-                        keyExtractor={(item) => item.id.toString()}
-                        renderItem={({ item }) => (
-                            <NewUserCard
-                                name={item.name}
-                                age={item.age}
-                                location={item.location}
-                                distance={item.distance}
-                                image={item.image}
-                                isNew={item.isNew}
-                                isOnline={item.isOnline}
+                    {loadingNewUsers ? (
+                        <View className="items-center justify-center py-10">
+                            <ActivityIndicator
+                                size="large"
+                                color={Colors.primary}
                             />
-                        )}
-                    />
+                            <Text className="mt-4 text-gray-500">
+                                Memuat user baru...
+                            </Text>
+                        </View>
+                    ) : (
+                        <FlatList
+                            data={newUsers}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={{ paddingHorizontal: 15 }}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={({ item }) => (
+                                <NewUserCard
+                                    name={item.name}
+                                    age={item.age}
+                                    location={item.location}
+                                    distance={item.distance}
+                                    image={item.image}
+                                    isNew={item.isNew}
+                                    isOnline={item.isOnline}
+                                />
+                            )}
+                            ListEmptyComponent={
+                                <View className="items-center justify-center py-10 px-5">
+                                    <Text className="text-gray-500">
+                                        Tidak ada user baru tersedia
+                                    </Text>
+                                </View>
+                            }
+                        />
+                    )}
                 </View>
 
                 {/* Interest Section */}
@@ -278,6 +250,20 @@ export default function App() {
 
                     {/* Map Container */}
                     <View className="relative">
+                        {loadingNearbyUsers && (
+                            <View
+                                className="absolute inset-0 items-center justify-center bg-white/80 z-20"
+                                style={{ borderRadius: 20 }}
+                            >
+                                <ActivityIndicator
+                                    size="large"
+                                    color={Colors.primary}
+                                />
+                                <Text className="mt-4 text-gray-500">
+                                    Memuat user di sekitar...
+                                </Text>
+                            </View>
+                        )}
                         {/* Peta */}
                         <AroundMeMap
                             users={filteredMapUsers}
@@ -290,7 +276,7 @@ export default function App() {
                             activeOpacity={0.8}
                             style={{
                                 position: "absolute",
-                                bottom: 100, // Jarak dari bawah map container
+                                bottom: 100,
                                 right: 20,
                                 width: 50,
                                 height: 50,
@@ -302,8 +288,8 @@ export default function App() {
                                 shadowOffset: { width: 0, height: 2 },
                                 shadowOpacity: 0.25,
                                 shadowRadius: 3.84,
-                                elevation: 5, // Shadow android
-                                zIndex: 10, // Pastikan di atas map
+                                elevation: 5,
+                                zIndex: 10,
                             }}
                         >
                             {loadingLocation ? (
