@@ -1,50 +1,75 @@
-# Welcome to your Expo app 👋
+# Friendzy
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Friendzy adalah aplikasi sosial berbasis React Native menggunakan Expo, yang memungkinkan pengguna untuk menemukan teman baru, berbagi cerita, dan berinteraksi melalui fitur peta, postingan, dan pesan.
 
-## Get started
+## Fitur Utama
 
-1. Install dependencies
+- **Peta Sekitar (AroundMeMap):** Temukan pengguna lain di sekitar Anda.
+- **Stories:** Bagikan cerita singkat yang menghilang setelah waktu tertentu.
+- **PostCard:** Lihat dan buat postingan.
+- **Interests:** Pilih dan tampilkan minat Anda.
+- **Pesan & Matches:** Kirim pesan dan temukan kecocokan dengan pengguna lain.
 
-   ```bash
-   npm install
-   ```
+## Struktur Proyek
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```text
+Friendzy/
+├── app/                # Halaman utama dan navigasi
+│   ├── (tabs)/         # Tab navigasi (add, discover, matches, messages)
+│   └── (matches)/      # Halaman detail match
+├── assets/             # Gambar dan aset statis
+├── components/         # Komponen UI (AroundMeMap, Button, Stories, dsb)
+├── config/             # Konfigurasi API
+├── services/           # Layanan API
+├── global.css          # Gaya global
+├── tailwind.config.js  # Konfigurasi Tailwind CSS
+├── package.json        # Dependensi dan skrip
+└── README.md           # Dokumentasi proyek
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Instalasi
 
-## Learn more
+1. **Clone repository:**
 
-To learn more about developing your project with Expo, look at the following resources:
+    ```sh
+    git clone https://github.com/Aldilaaaanr/Friendzy.git
+    cd Friendzy
+    ```
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+2. **Install dependencies:**
 
-## Join the community
+    ```sh
+    npm install
+    ```
 
-Join our community of developers creating universal apps.
+3. **Jalankan aplikasi:**
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+    ```sh
+    npx expo start
+    ```
+
+## Teknologi yang Digunakan
+
+- [React Native](https://reactnative.dev/)
+- [Expo](https://expo.dev/)
+- [Tailwind CSS (NativeWind)](https://www.nativewind.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+
+## Konfigurasi Tambahan
+
+- **API Endpoint:** Atur endpoint di `config/api.ts` dan `services/api.ts` sesuai kebutuhan backend Anda.
+- **Assets:** Tambahkan gambar di folder `assets/images/`.
+
+## Kontribusi
+
+1. Fork repository ini
+2. Buat branch fitur: `git checkout -b fitur-baru`
+3. Commit perubahan: `git commit -m 'Tambah fitur baru'`
+4. Push ke branch: `git push origin fitur-baru`
+5. Buat Pull Request
+
+## Lisensi
+
+Proyek ini dibuat untuk tugas UTS Pemgrograman Mobile.
+
+Aldila Nur Azizah
